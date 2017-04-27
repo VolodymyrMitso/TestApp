@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/mi_audiobooks"
+        android:enabled="true"
+        android:icon="@drawable/ic_first_tab"
+        android:title="@string/s_audiobooks"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/mi_movies"
+        android:enabled="true"
+        android:icon="@drawable/ic_second_tab"
+        android:title="@string/s_movies"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/mi_podcasts"
+        android:enabled="true"
+        android:icon="@drawable/ic_third_tab"
+        android:title="@string/s_podcasts"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/mi_favourites"
+        android:enabled="true"
+        android:icon="@drawable/ic_fourth_tab"
+        android:title="@string/s_favourites"
+        app:showAsAction="always" />
+
+</menu>

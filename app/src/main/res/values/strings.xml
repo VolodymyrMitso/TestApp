@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="s_app_name">TestApp</string>
+
+    <string name="s_audiobooks">Audiobooks</string>
+    <string name="s_movies">Movies</string>
+    <string name="s_podcasts">Podcasts</string>
+    <string name="s_favourites">Favourites</string>
+
+    <string name="s_no_network_connection">
+        There is no network connection. Please turn on wi-fi or 3g/4g. Please restart the app.
+    </string>
+    <string name="s_error">Something went wrong. Please restart the app.</string>
+</resources>

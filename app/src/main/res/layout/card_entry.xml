@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="entry"
+            type="com.mitso.testapp.models.Entry" />
+
+        <variable
+            name="clickerInfo"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="clickerAdd"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/d_card_padding"
+        android:paddingTop="@dimen/d_card_padding">
+
+        <ImageView
+            android:layout_centerVertical="true"
+            android:id="@+id/iv_image60x60_ce"
+            android:layout_width="@dimen/d_card_image_size"
+            android:layout_height="@dimen/d_card_image_size"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="@dimen/d_card_margin"
+            android:layout_marginStart="@dimen/d_card_margin"
+            app:onClickListener="@{clickerInfo}" />
+
+        <TextView
+            android:layout_centerVertical="true"
+            android:id="@+id/tv_title_ce"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/d_card_margin"
+            android:layout_marginRight="@dimen/d_card_margin"
+            android:layout_toEndOf="@+id/iv_image60x60_ce"
+            android:layout_toLeftOf="@+id/btn_add_ec"
+            android:layout_toRightOf="@+id/iv_image60x60_ce"
+            android:layout_toStartOf="@+id/btn_add_ec"
+            android:text="@{entry.imName.label}"
+            android:textColor="@color/c_card_text"
+            android:textSize="@dimen/d_card_text_size"
+            app:onClickListener="@{clickerInfo}"
+            tools:text="entry title"
+            android:clickable="true"/>
+
+        <Button
+            android:id="@+id/btn_add_ec"
+            android:layout_width="@dimen/d_card_button_size"
+            android:layout_height="@dimen/d_card_button_size"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/d_card_margin"
+            android:layout_marginRight="@dimen/d_card_margin"
+            android:background="@drawable/ic_add_circle"
+            app:onClickListener="@{clickerAdd}" />
+
+    </RelativeLayout>
+
+</layout>
