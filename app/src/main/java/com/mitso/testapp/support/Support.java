@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.widget.Toast;
 
 import com.mitso.testapp.R;
+import com.mitso.testapp.database.DatabaseHelper;
 
 public class Support {
 
@@ -21,5 +22,15 @@ public class Support {
     public void showToastNoNetworkConnection(Context _context) {
 
         Toast.makeText(_context, R.string.s_no_network_connection, Toast.LENGTH_LONG).show();
+    }
+
+    public boolean checkDatabaseExistence(Context _context) {
+
+        return _context.getDatabasePath(DatabaseHelper.DATABASE_NAME).exists();
+    }
+
+    public void showToastEmptyFavourites(Context _context) {
+
+        Toast.makeText(_context, R.string.s_empty_favourites, Toast.LENGTH_LONG).show();
     }
 }

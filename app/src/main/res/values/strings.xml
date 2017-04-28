@@ -11,4 +11,5 @@
         There is no network connection. Please turn on wi-fi or 3g/4g. Please restart the app.
     </string>
     <string name="s_error">Something went wrong. Please restart the app.</string>
+    <string name="s_empty_favourites">Favourites are empty. Please add something.</string>
 </resources>

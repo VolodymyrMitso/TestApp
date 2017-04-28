@@ -15,9 +15,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class GetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
+public class ApiGetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
 
-    public String               LOG_TAG = Constants.GET_ENTRY_LIST_TASK_LOG_TAG;
+    public String               LOG_TAG = Constants.API_GET_ENTRY_LIST_TASK_LOG_TAG;
 
     public interface Callback {
 
@@ -30,7 +30,7 @@ public class GetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
     private Callback            mCallback;
     private Exception           mException;
 
-    public GetEntryListTask(int _contentType) {
+    public ApiGetEntryListTask(int _contentType) {
 
         this.mEntryList = new ArrayList<>();
         this.mContentType = _contentType;

@@ -12,6 +12,7 @@ import com.mitso.testapp.constants.Constants;
 import com.mitso.testapp.databinding.ActivityMainBinding;
 import com.mitso.testapp.fragments.BaseFragment;
 import com.mitso.testapp.fragments.tabs.AudiobooksFragment;
+import com.mitso.testapp.fragments.tabs.FavouritesFragment;
 import com.mitso.testapp.fragments.tabs.MoviesFragment;
 import com.mitso.testapp.fragments.tabs.PodcastsFragment;
 
@@ -54,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.mi_podcasts:
                         Log.i(LOG_TAG, "PODCASTS ITEM IS SELECTED.");
                         commitFragment(new PodcastsFragment(), null);
+                        return true;
+
+                    case R.id.mi_favourites:
+                        Log.i(LOG_TAG, "FAVOURITES ITEM IS SELECTED.");
+                        commitFragment(new FavouritesFragment(), null);
                         return true;
 
                     default:

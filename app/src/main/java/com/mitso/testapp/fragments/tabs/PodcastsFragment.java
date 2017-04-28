@@ -10,8 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mitso.testapp.R;
-import com.mitso.testapp.api.tasks.GetEntryListTask;
+import com.mitso.testapp.api.tasks.ApiGetEntryListTask;
 import com.mitso.testapp.constants.Constants;
+import com.mitso.testapp.database.tasks.DbAddEntryTask;
 import com.mitso.testapp.databinding.FragmentListCommonBinding;
 import com.mitso.testapp.fragments.BaseFragment;
 import com.mitso.testapp.models.Entry;
@@ -46,7 +47,7 @@ public class PodcastsFragment extends BaseFragment implements IEntryHandler {
         initActionBar();
 
         if (mSupport.checkNetworkConnection(mMainActivity))
-            getEntryList(Constants.CONTENT_TYPE_PODCAST);
+            getEntryListApi(Constants.CONTENT_TYPE_PODCAST);
         else
             mSupport.showToastNoNetworkConnection(mMainActivity);
 
@@ -64,39 +65,39 @@ public class PodcastsFragment extends BaseFragment implements IEntryHandler {
             mMainActivity.getSupportActionBar().setTitle(getResources().getString(R.string.s_podcasts));
     }
 
-    public void getEntryList(int _contentType) {
+    public void getEntryListApi(int _contentType) {
 
-        final GetEntryListTask getEntryListTask = new GetEntryListTask(_contentType);
-        getEntryListTask.setCallback(new GetEntryListTask.Callback() {
+        final ApiGetEntryListTask apiGetEntryListTask = new ApiGetEntryListTask(_contentType);
+        apiGetEntryListTask.setCallback(new ApiGetEntryListTask.Callback() {
             @Override
             public void onSuccess(List<Entry> _result) {
 
-                Log.i(getEntryListTask.LOG_TAG, "ON SUCCESS: PODCAST LIST.");
-                Log.i(getEntryListTask.LOG_TAG, "LIST SIZE = " + String.valueOf(_result.size()) + ".");
-                Log.i(getEntryListTask.LOG_TAG, _result.get(0).toString());
-                Log.i(getEntryListTask.LOG_TAG, _result.get(_result.size() - 1).toString());
+                Log.i(apiGetEntryListTask.LOG_TAG, "ON SUCCESS: PODCAST LIST.");
+                Log.i(apiGetEntryListTask.LOG_TAG, "LIST SIZE = " + String.valueOf(_result.size()) + ".");
+                Log.i(apiGetEntryListTask.LOG_TAG, _result.get(0).toString());
+                Log.i(apiGetEntryListTask.LOG_TAG, _result.get(_result.size() - 1).toString());
 
                 for (int i = 0; i < _result.get(0).getLink().size(); i++)
-                    Log.i(getEntryListTask.LOG_TAG, _result.get(0).getLink().get(i).toString());
+                    Log.i(apiGetEntryListTask.LOG_TAG, _result.get(0).getLink().get(i).toString());
 
                 mEntryList = new ArrayList<>(_result);
 
                 initRecyclerView();
                 setHandler();
 
-                getEntryListTask.releaseCallback();
+                apiGetEntryListTask.releaseCallback();
             }
 
             @Override
             public void onFailure(Throwable _error) {
 
-                Log.e(getEntryListTask.LOG_TAG, "ON FAILURE: ERROR.");
-                _error.printStackTrace();
+                Log.e(apiGetEntryListTask.LOG_TAG, "ON FAILURE: ERROR.");
+                Log.e(apiGetEntryListTask.LOG_TAG, _error.toString());
 
-                getEntryListTask.releaseCallback();
+                apiGetEntryListTask.releaseCallback();
             }
         });
-        getEntryListTask.execute();
+        apiGetEntryListTask.execute();
     }
 
     private void initRecyclerView() {
@@ -116,7 +117,31 @@ public class PodcastsFragment extends BaseFragment implements IEntryHandler {
     @Override
     public void addToFavourites(Entry _entry) {
 
-        Log.i(LOG_TAG, _entry.toString());
+        addEntryDatabase(_entry);
+    }
+
+    private void addEntryDatabase(Entry _entry) {
+
+        final DbAddEntryTask dbAddEntryTask = new DbAddEntryTask(mMainActivity, _entry);
+        dbAddEntryTask.setCallback(new DbAddEntryTask.Callback() {
+            @Override
+            public void onSuccess() {
+
+                Log.i(dbAddEntryTask.LOG_TAG, "ON SUCCESS: ENTRY IS ADDED TO DATABASE.");
+
+                dbAddEntryTask.releaseCallback();
+            }
+
+            @Override
+            public void onFailure(Throwable _error) {
+
+                Log.e(dbAddEntryTask.LOG_TAG, "ON FAILURE: ERROR.");
+                Log.e(dbAddEntryTask.LOG_TAG, _error.toString());
+
+                dbAddEntryTask.releaseCallback();
+            }
+        });
+        dbAddEntryTask.execute();
     }
 
     private void setHandler() {
