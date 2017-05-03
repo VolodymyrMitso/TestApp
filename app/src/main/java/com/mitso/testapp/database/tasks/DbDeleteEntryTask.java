@@ -9,7 +9,7 @@ import com.mitso.testapp.constants.Constants;
 import com.mitso.testapp.database.DatabaseHelper;
 import com.mitso.testapp.models.Entry;
 
-public class DbDelteEntryTask extends AsyncTask<Void, Void, Void> {
+public class DbDeleteEntryTask extends AsyncTask<Void, Void, Void> {
 
     public String               LOG_TAG = Constants.DB_DELETE_ENTRY_TASK_LOG_TAG;
 
@@ -25,7 +25,7 @@ public class DbDelteEntryTask extends AsyncTask<Void, Void, Void> {
     private Exception           mException;
     private SQLiteDatabase      mSQLiteDatabase;
 
-    public DbDelteEntryTask(Context _context, Entry _entry) {
+    public DbDeleteEntryTask(Context _context, Entry _entry) {
 
         this.mDatabaseHelper = DatabaseHelper.getDatabaseHelper(_context);
         this.mEntry = _entry;
@@ -50,9 +50,8 @@ public class DbDelteEntryTask extends AsyncTask<Void, Void, Void> {
             mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
 
             mSQLiteDatabase.delete(DatabaseHelper.DATABASE_TABLE,
-                    DatabaseHelper.COLUMN_ENTRY_ID + " = " + new Gson().toJson(mEntry.getImName()),
-                    null);
-
+                    DatabaseHelper.COLUMN_ENTRY_ID + DatabaseHelper.EQUALS_SIGN + DatabaseHelper.QUESTION_MARK,
+                    new String[] { new Gson().toJson(mEntry.getId()) });
 
         } catch (Exception _error) {
 
@@ -69,5 +68,19 @@ public class DbDelteEntryTask extends AsyncTask<Void, Void, Void> {
         }
 
         return null;
+    }
+
+
+    @Override
+    protected void onPostExecute(Void _aVoid) {
+        super.onPostExecute(_aVoid);
+
+        if (mCallback != null) {
+
+            if (mException == null)
+                mCallback.onSuccess();
+            else
+                mCallback.onFailure(mException);
+        }
     }
 }

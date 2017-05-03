@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/d_line_size_cs"
+            android:background="@color/c_card_line"
+            android:layout_marginBottom="@dimen/d_margin_cs"
+            android:layout_marginTop="@dimen/d_margin_cs"
+            android:layout_marginLeft="@dimen/d_margin_left_cs"
+            android:layout_marginStart="@dimen/d_margin_left_cs">
+
+        </View>
+
+    </LinearLayout>
+
+</layout>

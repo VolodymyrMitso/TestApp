@@ -13,11 +13,13 @@ import com.mitso.testapp.R;
 import com.mitso.testapp.api.tasks.ApiGetEntryListTask;
 import com.mitso.testapp.constants.Constants;
 import com.mitso.testapp.database.tasks.DbAddEntryTask;
+import com.mitso.testapp.database.tasks.DbGetEntryListTask;
 import com.mitso.testapp.databinding.FragmentListCommonBinding;
 import com.mitso.testapp.fragments.BaseFragment;
 import com.mitso.testapp.models.Entry;
-import com.mitso.testapp.recycler_view.EntryAdapter;
-import com.mitso.testapp.recycler_view.IEntryHandler;
+import com.mitso.testapp.recycler_view.common.EntryAdapter;
+import com.mitso.testapp.recycler_view.common.IEntryHandler;
+import com.mitso.testapp.recycler_view.common.SpaceItemDecoration;
 import com.mitso.testapp.support.Support;
 
 import java.util.ArrayList;
@@ -31,8 +33,10 @@ public class AudiobooksFragment extends BaseFragment implements IEntryHandler {
 
     private Support                         mSupport;
 
-    private List<Entry>                     mEntryList;
+    private List<Entry>                     mApiEntryList;
     private EntryAdapter                    mEntryAdapter;
+
+    private List<Entry>                     mDbEntryList;
 
     @Nullable
     @Override
@@ -46,10 +50,17 @@ public class AudiobooksFragment extends BaseFragment implements IEntryHandler {
         initSupport();
         initActionBar();
 
-        if (mSupport.checkNetworkConnection(mMainActivity))
-            getEntryListApi(Constants.CONTENT_TYPE_AUDIOBOOK);
-        else
+        if (mSupport.checkNetworkConnection(mMainActivity)) {
+
+            Log.i(LOG_TAG, "NETWORK IS ONLINE.");
+
+            getEntriesFromApi(Constants.CONTENT_TYPE_AUDIOBOOK);
+
+        } else {
+
+            Log.i(LOG_TAG, "NETWORK IS OFFLINE.");
             mSupport.showToastNoNetworkConnection(mMainActivity);
+        }
 
         return rootView;
     }
@@ -65,26 +76,26 @@ public class AudiobooksFragment extends BaseFragment implements IEntryHandler {
             mMainActivity.getSupportActionBar().setTitle(getResources().getString(R.string.s_audiobooks));
     }
 
-
-    public void getEntryListApi(int _contentType) {
+    public void getEntriesFromApi(String _contentType) {
 
         final ApiGetEntryListTask apiGetEntryListTask = new ApiGetEntryListTask(_contentType);
         apiGetEntryListTask.setCallback(new ApiGetEntryListTask.Callback() {
             @Override
             public void onSuccess(List<Entry> _result) {
 
-                Log.i(apiGetEntryListTask.LOG_TAG, "ON SUCCESS: AUDIOBOOK LIST.");
-                Log.i(apiGetEntryListTask.LOG_TAG, "LIST SIZE = " + String.valueOf(_result.size()) + ".");
-                Log.i(apiGetEntryListTask.LOG_TAG, _result.get(0).toString());
-                Log.i(apiGetEntryListTask.LOG_TAG, _result.get(_result.size() - 1).toString());
+                if (mMainActivity != null && isAdded()) {
 
-                for (int i = 0; i < _result.get(0).getLink().size(); i++)
-                    Log.i(apiGetEntryListTask.LOG_TAG, _result.get(0).getLink().get(i).toString());
+                    Log.i(apiGetEntryListTask.LOG_TAG, "ON SUCCESS: AUDIOBOOK LIST.");
 
-                mEntryList = new ArrayList<>(_result);
+                    mApiEntryList = new ArrayList<>(_result);
 
-                initRecyclerView();
-                setHandler();
+                    getEntriesFromDatabase();
+
+                } else {
+
+                    Log.e(apiGetEntryListTask.LOG_TAG, "ON SUCCESS.");
+                    Log.e(apiGetEntryListTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+                }
 
                 apiGetEntryListTask.releaseCallback();
             }
@@ -92,8 +103,18 @@ public class AudiobooksFragment extends BaseFragment implements IEntryHandler {
             @Override
             public void onFailure(Throwable _error) {
 
-                Log.e(apiGetEntryListTask.LOG_TAG, "ON FAILURE: ERROR.");
-                Log.e(apiGetEntryListTask.LOG_TAG, _error.toString());
+                if (mMainActivity != null && isAdded()) {
+
+                    Log.e(apiGetEntryListTask.LOG_TAG, "ON FAILURE: ERROR.");
+                    Log.e(apiGetEntryListTask.LOG_TAG, _error.toString());
+
+                    mSupport.showToastError(mMainActivity);
+
+                } else {
+
+                    Log.e(apiGetEntryListTask.LOG_TAG, "ON FAILURE.");
+                    Log.e(apiGetEntryListTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+                }
 
                 apiGetEntryListTask.releaseCallback();
             }
@@ -101,12 +122,70 @@ public class AudiobooksFragment extends BaseFragment implements IEntryHandler {
         apiGetEntryListTask.execute();
     }
 
+    private void getEntriesFromDatabase() {
+
+        final DbGetEntryListTask dbGetEntryListTask = new DbGetEntryListTask(mMainActivity);
+        dbGetEntryListTask.setCallback(new DbGetEntryListTask.Callback() {
+            @Override
+            public void onSuccess(List<Entry> _result) {
+
+                if (mMainActivity != null && isAdded()) {
+
+                    if (!_result.isEmpty()) {
+
+                        Log.i(dbGetEntryListTask.LOG_TAG, "ON SUCCESS: FAVOURITES LIST.");
+
+                        mDbEntryList = new ArrayList<>(_result);
+
+                    } else {
+
+                        Log.i(dbGetEntryListTask.LOG_TAG, "ON SUCCESS: LIST IS EMPTY.");
+
+                        mDbEntryList = new ArrayList<>();
+                    }
+
+                    initRecyclerView();
+                    setHandler();
+
+                } else {
+
+                    Log.e(dbGetEntryListTask.LOG_TAG, "ON SUCCESS.");
+                    Log.e(dbGetEntryListTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+                }
+
+                dbGetEntryListTask.releaseCallback();
+            }
+
+            @Override
+            public void onFailure(Throwable _error) {
+
+                if (mMainActivity != null && isAdded()) {
+
+                    Log.e(dbGetEntryListTask.LOG_TAG, "ON FAILURE: ERROR.");
+                    Log.e(dbGetEntryListTask.LOG_TAG, _error.toString());
+
+                    mSupport.showToastError(mMainActivity);
+
+                } else {
+
+                    Log.e(dbGetEntryListTask.LOG_TAG, "ON FAILURE.");
+                    Log.e(dbGetEntryListTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+                }
+
+                dbGetEntryListTask.releaseCallback();
+            }
+        });
+        dbGetEntryListTask.execute();
+    }
+
     private void initRecyclerView() {
 
-        mEntryAdapter = new EntryAdapter(mMainActivity, mEntryList);
+        mEntryAdapter = new EntryAdapter(mMainActivity, mApiEntryList);
 
         mBinding.rvEntriesFlc.setAdapter(mEntryAdapter);
         mBinding.rvEntriesFlc.setLayoutManager(new LinearLayoutManager(mMainActivity));
+        mBinding.rvEntriesFlc.addItemDecoration(
+                new SpaceItemDecoration(getResources().getDimensionPixelSize(R.dimen.d_space_size_cec)));
     }
 
     @Override
@@ -118,17 +197,35 @@ public class AudiobooksFragment extends BaseFragment implements IEntryHandler {
     @Override
     public void addToFavourites(Entry _entry) {
 
-        addEntryDatabase(_entry);
+        if (!mDbEntryList.contains(_entry)) {
+
+            mDbEntryList.add(_entry);
+            addEntryToDatabase(_entry);
+
+        } else {
+
+            Log.i(LOG_TAG, "ENTRY IS ALREADY IN FAVOURITES.");
+            mSupport.showToastAlreadyIn(mMainActivity);
+        }
     }
 
-    private void addEntryDatabase(Entry _entry) {
+    private void addEntryToDatabase(Entry _entry) {
 
         final DbAddEntryTask dbAddEntryTask = new DbAddEntryTask(mMainActivity, _entry);
         dbAddEntryTask.setCallback(new DbAddEntryTask.Callback() {
             @Override
             public void onSuccess() {
 
-                Log.i(dbAddEntryTask.LOG_TAG, "ON SUCCESS: ENTRY IS ADDED TO DATABASE.");
+                if (mMainActivity != null && isAdded()) {
+
+                    Log.i(dbAddEntryTask.LOG_TAG, "ON SUCCESS: ENTRY IS ADDED TO DATABASE.");
+                    mSupport.showToastAdded(mMainActivity);
+
+                } else {
+
+                    Log.e(dbAddEntryTask.LOG_TAG, "ON SUCCESS.");
+                    Log.e(dbAddEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+                }
 
                 dbAddEntryTask.releaseCallback();
             }
@@ -136,8 +233,18 @@ public class AudiobooksFragment extends BaseFragment implements IEntryHandler {
             @Override
             public void onFailure(Throwable _error) {
 
-                Log.e(dbAddEntryTask.LOG_TAG, "ON FAILURE: ERROR.");
-                Log.e(dbAddEntryTask.LOG_TAG, _error.toString());
+                if (mMainActivity != null && isAdded()) {
+
+                    Log.e(dbAddEntryTask.LOG_TAG, "ON FAILURE: ERROR.");
+                    Log.e(dbAddEntryTask.LOG_TAG, _error.toString());
+
+                    mSupport.showToastError(mMainActivity);
+
+                } else {
+
+                    Log.e(dbAddEntryTask.LOG_TAG, "ON FAILURE.");
+                    Log.e(dbAddEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+                }
 
                 dbAddEntryTask.releaseCallback();
             }
@@ -148,13 +255,13 @@ public class AudiobooksFragment extends BaseFragment implements IEntryHandler {
     private void setHandler() {
 
         if (mEntryAdapter != null)
-            mEntryAdapter.setCommonHandler(this);
+            mEntryAdapter.setEntryHandler(this);
     }
 
     private void releaseHandler() {
 
         if (mEntryAdapter != null)
-            mEntryAdapter.releaseCommonHandler();
+            mEntryAdapter.releaseEntryHandler();
     }
 
     @Override

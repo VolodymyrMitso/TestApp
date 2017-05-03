@@ -25,12 +25,12 @@ public class ApiGetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
         void onFailure(Throwable _error);
     }
 
-    private int                 mContentType;
+    private String              mContentType;
     private List<Entry>         mEntryList;
     private Callback            mCallback;
     private Exception           mException;
 
-    public ApiGetEntryListTask(int _contentType) {
+    public ApiGetEntryListTask(String _contentType) {
 
         this.mEntryList = new ArrayList<>();
         this.mContentType = _contentType;
@@ -58,7 +58,7 @@ public class ApiGetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
                     .build();
             final Api api = retrofit.create(Api.class);
 
-            if (mContentType == Constants.CONTENT_TYPE_AUDIOBOOK) {
+            if (mContentType.equals(Constants.CONTENT_TYPE_AUDIOBOOK)) {
 
                 final Call<JsonData> call = api.getAudiobooks();
                 final Response<JsonData> response = call.execute();
@@ -68,7 +68,7 @@ public class ApiGetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
                 return null;
             }
 
-            if (mContentType == Constants.CONTENT_TYPE_MOVIE) {
+            if (mContentType.equals(Constants.CONTENT_TYPE_MOVIE)) {
 
                 final Call<JsonData> call = api.getMovies();
                 final Response<JsonData> response = call.execute();
@@ -78,7 +78,7 @@ public class ApiGetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
                 return null;
             }
 
-            if (mContentType == Constants.CONTENT_TYPE_PODCAST) {
+            if (mContentType.equals(Constants.CONTENT_TYPE_PODCAST)) {
 
 
                 final Call<JsonData> call = api.getPodcasts();

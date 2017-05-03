@@ -2,7 +2,6 @@ package com.mitso.testapp.models;
 
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-import com.mitso.testapp.models.adapter.LinkAdapterFactory;
 import com.mitso.testapp.models.entry.EntryCategory;
 import com.mitso.testapp.models.entry.EntryId;
 import com.mitso.testapp.models.entry.EntryLink;
@@ -15,10 +14,12 @@ import com.mitso.testapp.models.entry.ImImage;
 import com.mitso.testapp.models.entry.ImName;
 import com.mitso.testapp.models.entry.ImPrice;
 import com.mitso.testapp.models.entry.ImReleaseDate;
+import com.mitso.testapp.models.recycler_view.BaseModel;
+import com.mitso.testapp.models.type_adapter.LinkAdapterFactory;
 
 import java.util.List;
 
-public class Entry {
+public class Entry extends BaseModel {
 
     @SerializedName("im:name")
     private ImName imName;
@@ -46,6 +47,50 @@ public class Entry {
     private EntryCategory category;
     @SerializedName("summary")
     private EntrySummary summary;
+
+    @Override
+    public String toString() {
+        return
+                "Entry{" + "\n" +
+                "imName=" + imName + "\n" +
+                "rights=" + rights + "\n" +
+                "imPrice=" + imPrice + "\n" +
+                "imImage=" + imImage + "\n" +
+                "imArtist=" + imArtist + "\n" +
+                "title=" + title + "\n" +
+                "link=" + link + "\n" +
+                "id=" + id + "\n" +
+                "imContentType=" + imContentType + "\n" +
+                "category=" + category + "\n" +
+                "imReleaseDate=" + imReleaseDate + "\n" +
+                "summary=" + summary + "\n" +
+                '}';
+    }
+
+    @Override
+    public int getType() {
+
+        return TYPE_ENTRY;
+    }
+
+    @Override
+    public boolean equals(Object _object) {
+
+        if (this == _object) return true;
+        if (_object == null || getClass() != _object.getClass()) return false;
+
+        final Entry entry = (Entry) _object;
+
+        return id.equals(entry.id);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return id.hashCode();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     public ImName getImName() {
         return imName;
@@ -141,24 +186,5 @@ public class Entry {
 
     public void setSummary(EntrySummary summary) {
         this.summary = summary;
-    }
-
-    @Override
-    public String toString() {
-        return
-                "Entry{" + "\n" +
-                "imName=" + imName + "\n" +
-                "rights=" + rights + "\n" +
-                "imPrice=" + imPrice + "\n" +
-                "imImage=" + imImage + "\n" +
-                "imArtist=" + imArtist + "\n" +
-                "title=" + title + "\n" +
-                "link=" + link + "\n" +
-                "id=" + id + "\n" +
-                "imContentType=" + imContentType + "\n" +
-                "category=" + category + "\n" +
-                "imReleaseDate=" + imReleaseDate + "\n" +
-                "summary=" + summary + "\n" +
-                '}';
     }
 }

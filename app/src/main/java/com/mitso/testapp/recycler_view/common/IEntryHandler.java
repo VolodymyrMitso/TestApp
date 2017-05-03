@@ -1,4 +1,4 @@
-package com.mitso.testapp.recycler_view;
+package com.mitso.testapp.recycler_view.common;
 
 import com.mitso.testapp.models.Entry;
 

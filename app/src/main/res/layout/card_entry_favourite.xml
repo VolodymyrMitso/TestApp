@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="entry"
+            type="com.mitso.testapp.models.Entry" />
+
+        <variable
+            name="clickerInfo"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="clickerDelete"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/iv_cover_cef"
+            android:layout_width="@dimen/d_image_size_cef"
+            android:layout_height="@dimen/d_image_size_cef"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/d_margin_left_cef"
+            android:layout_marginStart="@dimen/d_margin_left_cef"
+            app:onClickListener="@{clickerInfo}" />
+
+        <TextView
+            android:id="@+id/tv_title_cef"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/d_margin_cef"
+            android:layout_marginRight="@dimen/d_margin_cef"
+            android:layout_toEndOf="@+id/iv_cover_cef"
+            android:layout_toLeftOf="@+id/btn_add_ecf"
+            android:layout_toRightOf="@+id/iv_cover_cef"
+            android:layout_toStartOf="@+id/btn_add_ecf"
+            android:clickable="true"
+            android:text="@{entry.imName.label}"
+            android:textColor="@color/c_card_text"
+            android:textSize="@dimen/d_text_size_cef"
+            app:onClickListener="@{clickerInfo}"
+            tools:text="entry title" />
+
+        <Button
+            android:id="@+id/btn_add_ecf"
+            android:layout_width="@dimen/d_button_size_cef"
+            android:layout_height="@dimen/d_button_size_cef"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/d_margin_cef"
+            android:layout_marginRight="@dimen/d_margin_cef"
+            android:background="@drawable/ic_remove_circle"
+            app:onClickListener="@{clickerDelete}" />
+
+    </RelativeLayout>
+
+</layout>

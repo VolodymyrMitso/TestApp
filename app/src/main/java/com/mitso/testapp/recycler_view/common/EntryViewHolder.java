@@ -1,14 +1,14 @@
-package com.mitso.testapp.recycler_view;
+package com.mitso.testapp.recycler_view.common;
 
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.mitso.testapp.databinding.CardEntryBinding;
+import com.mitso.testapp.databinding.CardEntryCommonBinding;
 
 public class EntryViewHolder extends RecyclerView.ViewHolder {
 
-    private CardEntryBinding        mBinding;
+    private CardEntryCommonBinding      mBinding;
 
     public EntryViewHolder(View _itemView) {
         super(_itemView);
@@ -16,7 +16,7 @@ public class EntryViewHolder extends RecyclerView.ViewHolder {
         mBinding = DataBindingUtil.bind(_itemView);
     }
 
-    public CardEntryBinding getBinding() {
+    public CardEntryCommonBinding getBinding() {
         return mBinding;
     }
 }

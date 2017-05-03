@@ -11,32 +11,34 @@ import android.view.ViewGroup;
 
 import com.mitso.testapp.R;
 import com.mitso.testapp.constants.Constants;
+import com.mitso.testapp.database.tasks.DbDeleteEntryTask;
 import com.mitso.testapp.database.tasks.DbGetEntryListTask;
-import com.mitso.testapp.databinding.FragmentListCommonBinding;
+import com.mitso.testapp.databinding.FragmentListFavouriteBinding;
 import com.mitso.testapp.fragments.BaseFragment;
 import com.mitso.testapp.models.Entry;
-import com.mitso.testapp.recycler_view.EntryAdapter;
-import com.mitso.testapp.recycler_view.IEntryHandler;
+import com.mitso.testapp.models.recycler_view.BaseModel;
+import com.mitso.testapp.recycler_view.favourites.FavouriteAdapter;
+import com.mitso.testapp.recycler_view.favourites.IFavouriteHandler;
 import com.mitso.testapp.support.Support;
 
 import java.util.List;
 
-public class FavouritesFragment extends BaseFragment implements IEntryHandler {
+public class FavouritesFragment extends BaseFragment implements IFavouriteHandler {
 
     private String                          LOG_TAG = Constants.FAVOURITES_FRAGMENT_LOG_TAG;
 
-    private FragmentListCommonBinding       mBinding;
+    private FragmentListFavouriteBinding    mBinding;
 
     private Support                         mSupport;
 
-    private List<Entry>                     mEntryList;
-    private EntryAdapter                    mEntryAdapter;
+    private List<BaseModel>                 mFavouriteList;
+    private FavouriteAdapter                mFavouriteAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater _inflater, @Nullable ViewGroup _container, @Nullable Bundle _savedInstanceState) {
 
-        mBinding = DataBindingUtil.inflate(_inflater, R.layout.fragment_list_common, _container, false);
+        mBinding = DataBindingUtil.inflate(_inflater, R.layout.fragment_list_favourite, _container, false);
         final View rootView = mBinding.getRoot();
 
         Log.i(LOG_TAG, "FAVOURITES FRAGMENT IS CREATED.");
@@ -44,10 +46,7 @@ public class FavouritesFragment extends BaseFragment implements IEntryHandler {
         initSupport();
         initActionBar();
 
-        if (mSupport.checkDatabaseExistence(mMainActivity))
-            getEntriesDatabase();
-        else
-            mSupport.showToastEmptyFavourites(mMainActivity);
+        getEntriesFromDatabase();
 
         return rootView;
     }
@@ -63,27 +62,35 @@ public class FavouritesFragment extends BaseFragment implements IEntryHandler {
             mMainActivity.getSupportActionBar().setTitle(getResources().getString(R.string.s_favourites));
     }
 
-    private void getEntriesDatabase() {
+    private void getEntriesFromDatabase() {
 
         final DbGetEntryListTask dbGetEntryListTask = new DbGetEntryListTask(mMainActivity);
         dbGetEntryListTask.setCallback(new DbGetEntryListTask.Callback() {
             @Override
             public void onSuccess(List<Entry> _result) {
 
-                if (_result != null && !_result.isEmpty()) {
+                if (mMainActivity != null && isAdded()) {
 
-                    Log.i(dbGetEntryListTask.LOG_TAG, "ON SUCCESS: FAVOURITES LIST.");
+                    if (!_result.isEmpty()) {
 
-                    for (int i = 0; i < _result.size(); i++)
-                        Log.i(dbGetEntryListTask.LOG_TAG, _result.get(i).toString());
+                        Log.i(dbGetEntryListTask.LOG_TAG, "ON SUCCESS: FAVOURITES LIST.");
 
-                    mEntryList = _result;
+                        mFavouriteList = mSupport.groupList(mMainActivity, _result);
 
-                    initRecyclerView();
-                    setHandler();
+                        initRecyclerView();
+                        setHandler();
 
-                } else
-                    Log.i(LOG_TAG, "ON SUCCESS: NULL OR EMPTY.");
+                    } else {
+
+                        Log.i(dbGetEntryListTask.LOG_TAG, "ON SUCCESS: LIST IS EMPTY.");
+                        mSupport.showToastEmptyFavourites(mMainActivity);
+                    }
+
+                } else {
+
+                    Log.e(dbGetEntryListTask.LOG_TAG, "ON SUCCESS.");
+                    Log.e(dbGetEntryListTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+                }
 
                 dbGetEntryListTask.releaseCallback();
             }
@@ -91,8 +98,18 @@ public class FavouritesFragment extends BaseFragment implements IEntryHandler {
             @Override
             public void onFailure(Throwable _error) {
 
-                Log.e(dbGetEntryListTask.LOG_TAG, "ON FAILURE: ERROR.");
-                Log.e(dbGetEntryListTask.LOG_TAG, _error.toString());
+                if (mMainActivity != null && isAdded()) {
+
+                    Log.e(dbGetEntryListTask.LOG_TAG, "ON FAILURE: ERROR.");
+                    Log.e(dbGetEntryListTask.LOG_TAG, _error.toString());
+
+                    mSupport.showToastError(mMainActivity);
+
+                } else {
+
+                    Log.e(dbGetEntryListTask.LOG_TAG, "ON FAILURE.");
+                    Log.e(dbGetEntryListTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+                }
 
                 dbGetEntryListTask.releaseCallback();
             }
@@ -102,9 +119,9 @@ public class FavouritesFragment extends BaseFragment implements IEntryHandler {
 
     private void initRecyclerView() {
 
-        mEntryAdapter = new EntryAdapter(mMainActivity, mEntryList);
+        mFavouriteAdapter = new FavouriteAdapter(mMainActivity, mFavouriteList);
 
-        mBinding.rvEntriesFlc.setAdapter(mEntryAdapter);
+        mBinding.rvEntriesFlc.setAdapter(mFavouriteAdapter);
         mBinding.rvEntriesFlc.setLayoutManager(new LinearLayoutManager(mMainActivity));
     }
 
@@ -115,21 +132,65 @@ public class FavouritesFragment extends BaseFragment implements IEntryHandler {
     }
 
     @Override
-    public void addToFavourites(Entry _entry) {
+    public void deleteFromFavourites(Entry _entry, int _position) {
 
-        Log.i(LOG_TAG, _entry.toString());
+        mFavouriteAdapter.removeFavourite(_position);
+        deleteEntryFromDatabase(_entry);
+    }
+
+    private void deleteEntryFromDatabase(Entry _entry) {
+
+        final DbDeleteEntryTask dbDeleteEntryTask = new DbDeleteEntryTask(mMainActivity, _entry);
+        dbDeleteEntryTask.setCallback(new DbDeleteEntryTask.Callback() {
+            @Override
+            public void onSuccess() {
+
+                if (mMainActivity != null && isAdded()) {
+
+                    Log.i(dbDeleteEntryTask.LOG_TAG, "ON SUCCESS: ENTRY IS DELETED FROM DATABASE.");
+                    mSupport.showToastDeleted(mMainActivity);
+
+                } else {
+
+                    Log.e(dbDeleteEntryTask.LOG_TAG, "ON SUCCESS.");
+                    Log.e(dbDeleteEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+                }
+
+                dbDeleteEntryTask.releaseCallback();
+            }
+
+            @Override
+            public void onFailure(Throwable _error) {
+
+                if (mMainActivity != null && isAdded()) {
+
+                    Log.e(dbDeleteEntryTask.LOG_TAG, "ON FAILURE: ERROR.");
+                    Log.e(dbDeleteEntryTask.LOG_TAG, _error.toString());
+
+                    mSupport.showToastError(mMainActivity);
+
+                } else {
+
+                    Log.e(dbDeleteEntryTask.LOG_TAG, "ON FAILURE.");
+                    Log.e(dbDeleteEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+                }
+
+                dbDeleteEntryTask.releaseCallback();
+            }
+        });
+        dbDeleteEntryTask.execute();
     }
 
     private void setHandler() {
 
-        if (mEntryAdapter != null)
-            mEntryAdapter.setCommonHandler(this);
+        if (mFavouriteAdapter != null)
+            mFavouriteAdapter.setFavouriteHandler(this);
     }
 
     private void releaseHandler() {
 
-        if (mEntryAdapter != null)
-            mEntryAdapter.releaseCommonHandler();
+        if (mFavouriteAdapter != null)
+            mFavouriteAdapter.releaseFavouriteHandler();
     }
 
     @Override

@@ -33,7 +33,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String      PARENTHESES_IN      = "(";
     public static final String      PARENTHESES_OUT     = ")";
 
-    public static final String      EQUALS      = "=";
+    public static final String      EQUALS_SIGN         = "=";
+    public static final String      QUESTION_MARK       = "?";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 

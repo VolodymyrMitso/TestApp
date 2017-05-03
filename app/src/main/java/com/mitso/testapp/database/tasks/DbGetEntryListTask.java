@@ -28,7 +28,7 @@ import java.util.List;
 
 public class DbGetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
 
-    public String               LOG_TAG = Constants.API_GET_ENTRY_LIST_TASK_LOG_TAG;
+    public String               LOG_TAG = Constants.DB_GET_ENTRY_LIST_TASK_LOG_TAG;
 
     public interface Callback{
 

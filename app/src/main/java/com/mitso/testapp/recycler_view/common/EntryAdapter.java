@@ -1,4 +1,4 @@
-package com.mitso.testapp.recycler_view;
+package com.mitso.testapp.recycler_view.common;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -7,10 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.mitso.testapp.constants.Constants;
-import com.mitso.testapp.databinding.CardEntryBinding;
+import com.mitso.testapp.databinding.CardEntryCommonBinding;
 import com.mitso.testapp.models.Entry;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,33 +34,34 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup _parent, int _viewType) {
 
-        return new EntryViewHolder(CardEntryBinding.inflate(LayoutInflater.from(_parent.getContext()), _parent, false).getRoot());
+        return new EntryViewHolder(CardEntryCommonBinding.inflate(LayoutInflater.from(_parent.getContext()), _parent, false).getRoot());
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder _holder, int _position) {
 
         final Entry entry = mEntryList.get(_position);
-        final EntryViewHolder userViewHolder = (EntryViewHolder) _holder;
+        final EntryViewHolder entryViewHolder = (EntryViewHolder) _holder;
 
-        userViewHolder.getBinding().setEntry(entry);
+        entryViewHolder.getBinding().setEntry(entry);
 
-        userViewHolder.getBinding().setClickerInfo(new View.OnClickListener() {
+        entryViewHolder.getBinding().setClickerInfo(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mEntryHandler.showInfo(entry);
             }
         });
 
-        userViewHolder.getBinding().setClickerAdd(new View.OnClickListener() {
+        entryViewHolder.getBinding().setClickerAdd(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mEntryHandler.addToFavourites(entry);
             }
         });
 
-        final String imageLink = entry.getImImage().get(1).getLabel();
-        Picasso.with(mContext).load(imageLink).into(userViewHolder.getBinding().ivImage60x60Ce);
+        Glide.with(mContext)
+                .load(entry.getImImage().get(1).getLabel())
+                .into(entryViewHolder.getBinding().ivCoverCec);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return mEntryList.size();
     }
 
-    public void setCommonHandler(IEntryHandler _entryHandler) {
+    public void setEntryHandler(IEntryHandler _entryHandler) {
 
         if (mEntryHandler == null) {
             mEntryHandler = _entryHandler;
@@ -77,7 +78,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    public void releaseCommonHandler() {
+    public void releaseEntryHandler() {
 
         if (mEntryHandler != null) {
             mEntryHandler = null;

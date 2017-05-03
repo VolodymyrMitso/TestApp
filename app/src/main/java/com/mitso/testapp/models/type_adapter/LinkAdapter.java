@@ -1,4 +1,4 @@
-package com.mitso.testapp.models.adapter;
+package com.mitso.testapp.models.type_adapter;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;

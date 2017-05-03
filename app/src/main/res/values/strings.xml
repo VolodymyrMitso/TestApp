@@ -12,4 +12,8 @@
     </string>
     <string name="s_error">Something went wrong. Please restart the app.</string>
     <string name="s_empty_favourites">Favourites are empty. Please add something.</string>
+
+    <string name="s_already_in">Entry is already in favourites.</string>
+    <string name="s_added">Entry is added to favourites.</string>
+    <string name="s_deleted">Entry is deleted from favourites.</string>
 </resources>

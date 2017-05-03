@@ -25,6 +25,26 @@ public class EntryId {
     }
 
     @Override
+    public boolean equals(Object _object) {
+
+        if (this == _object) return true;
+        if (_object == null || getClass() != _object.getClass()) return false;
+
+        final EntryId entryId = (EntryId) _object;
+
+        if (!label.equals(entryId.label)) return false;
+        return attributes.equals(entryId.attributes);
+    }
+
+    @Override
+    public int hashCode() {
+
+        int result = label.hashCode();
+        result = 31 * result + attributes.hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
         return
                 "EntryId{" +
