@@ -4,8 +4,8 @@ import android.os.AsyncTask;
 
 import com.mitso.testapp.api.Api;
 import com.mitso.testapp.constants.Constants;
-import com.mitso.testapp.models.Entry;
-import com.mitso.testapp.models.JsonData;
+import com.mitso.testapp.models.json_entry_list.Entry;
+import com.mitso.testapp.models.json_entry_list.JsonEntryList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,39 +53,39 @@ public class ApiGetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
 
         try {
             final Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(Constants.BASE_URL)
+                    .baseUrl(Constants.BASE_ENTRY_LIST_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
             final Api api = retrofit.create(Api.class);
 
             if (mContentType.equals(Constants.CONTENT_TYPE_AUDIOBOOK)) {
 
-                final Call<JsonData> call = api.getAudiobooks();
-                final Response<JsonData> response = call.execute();
-                final JsonData jsonData = response.body();
+                final Call<JsonEntryList> call = api.getAudiobooks();
+                final Response<JsonEntryList> response = call.execute();
+                final JsonEntryList jsonEntryList = response.body();
 
-                mEntryList.addAll(jsonData.getFeed().getEntry());
+                mEntryList.addAll(jsonEntryList.getFeed().getEntry());
                 return null;
             }
 
             if (mContentType.equals(Constants.CONTENT_TYPE_MOVIE)) {
 
-                final Call<JsonData> call = api.getMovies();
-                final Response<JsonData> response = call.execute();
-                final JsonData jsonData = response.body();
+                final Call<JsonEntryList> call = api.getMovies();
+                final Response<JsonEntryList> response = call.execute();
+                final JsonEntryList jsonEntryList = response.body();
 
-                mEntryList.addAll(jsonData.getFeed().getEntry());
+                mEntryList.addAll(jsonEntryList.getFeed().getEntry());
                 return null;
             }
 
             if (mContentType.equals(Constants.CONTENT_TYPE_PODCAST)) {
 
 
-                final Call<JsonData> call = api.getPodcasts();
-                final Response<JsonData> response = call.execute();
-                final JsonData jsonData = response.body();
+                final Call<JsonEntryList> call = api.getPodcasts();
+                final Response<JsonEntryList> response = call.execute();
+                final JsonEntryList jsonEntryList = response.body();
 
-                mEntryList.addAll(jsonData.getFeed().getEntry());
+                mEntryList.addAll(jsonEntryList.getFeed().getEntry());
                 return null;
             }
 

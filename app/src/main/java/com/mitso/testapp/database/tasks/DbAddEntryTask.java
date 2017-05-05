@@ -8,13 +8,13 @@ import android.os.AsyncTask;
 import com.google.gson.Gson;
 import com.mitso.testapp.constants.Constants;
 import com.mitso.testapp.database.DatabaseHelper;
-import com.mitso.testapp.models.Entry;
+import com.mitso.testapp.models.json_entry_list.Entry;
 
 public class DbAddEntryTask extends AsyncTask<Void, Void, Void> {
 
     public String               LOG_TAG = Constants.DB_ADD_ENTRY_TASK_LOG_TAG;
 
-    public interface Callback{
+    public interface Callback {
 
         void onSuccess();
         void onFailure(Throwable _error);
@@ -65,7 +65,7 @@ public class DbAddEntryTask extends AsyncTask<Void, Void, Void> {
             values.put(DatabaseHelper.COLUMN_ENTRY_CATEGORY, new Gson().toJson(mEntry.getCategory()));
             values.put(DatabaseHelper.COLUMN_ENTRY_SUMMARY, new Gson().toJson(mEntry.getSummary()));
 
-            mSQLiteDatabase.insert(DatabaseHelper.DATABASE_TABLE, null, values);
+            mSQLiteDatabase.insert(DatabaseHelper.DATABASE_FAVOURITES_TABLE, null, values);
 
         } catch (Exception _error) {
 

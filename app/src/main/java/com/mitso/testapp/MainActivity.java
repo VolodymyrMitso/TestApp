@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -22,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding         mBinding;
 
+    private boolean                     shouldCommitFragment = true;
+
     @Override
     protected void onCreate(Bundle _savedInstanceState) {
         super.onCreate(_savedInstanceState);
@@ -31,7 +34,18 @@ public class MainActivity extends AppCompatActivity {
 
         initBottomBar();
 
-        commitFragment(new AudiobooksFragment(), null);
+        commitFragment(new AudiobooksFragment(), Constants.AUDIOBOOKS_FRAGMENT_TAG, null);
+    }
+
+    public void commitFragment(BaseFragment _baseFragment, String _fragmentTag, Bundle _bundle) {
+
+        _baseFragment.setArguments(_bundle);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fl_container_am, _baseFragment, _fragmentTag)
+                .addToBackStack(_fragmentTag)
+                .commitAllowingStateLoss();
     }
 
     private void initBottomBar() {
@@ -39,27 +53,31 @@ public class MainActivity extends AppCompatActivity {
         mBinding.bottomBarAm.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem _item) {
+
                 switch (_item.getItemId()) {
 
                     case R.id.mi_audiobooks:
                         Log.i(LOG_TAG, "AUDIOBOOKS ITEM IS SELECTED.");
-                        commitFragment(new AudiobooksFragment(), null);
+                        if (shouldCommitFragment)
+                            commitFragment(new AudiobooksFragment(), Constants.AUDIOBOOKS_FRAGMENT_TAG, null);
                         return true;
 
                     case R.id.mi_movies:
                         Log.i(LOG_TAG, "MOVIES ITEM IS SELECTED.");
-                        commitFragment(new MoviesFragment(), null);
+                        if (shouldCommitFragment)
+                            commitFragment(new MoviesFragment(), Constants.MOVIES_FRAGMENT_TAG, null);
                         return true;
-
 
                     case R.id.mi_podcasts:
                         Log.i(LOG_TAG, "PODCASTS ITEM IS SELECTED.");
-                        commitFragment(new PodcastsFragment(), null);
+                        if (shouldCommitFragment)
+                            commitFragment(new PodcastsFragment(), Constants.PODCASTS_FRAGMENT_TAG, null);
                         return true;
 
                     case R.id.mi_favourites:
                         Log.i(LOG_TAG, "FAVOURITES ITEM IS SELECTED.");
-                        commitFragment(new FavouritesFragment(), null);
+                        if (shouldCommitFragment)
+                            commitFragment(new FavouritesFragment(), Constants.FAVOURITES_FRAGMENT_TAG, null);
                         return true;
 
                     default:
@@ -77,63 +95,91 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void commitFragment(BaseFragment _baseFragment, Bundle _bundle) {
+    @Override
+    public void onBackPressed() {
 
-        _baseFragment.setArguments(_bundle);
+        final FragmentManager fragmentManager = getSupportFragmentManager();
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fl_container_am, _baseFragment)
-                .commitAllowingStateLoss();
+        if (fragmentManager.getBackStackEntryCount() > 2) {
+
+            final String lastFragmentTag =
+                    fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 2).getName();
+
+            final String penultFragmentTag =
+                    fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 3).getName();
+
+            if (lastFragmentTag.equals(Constants.INFO_FRAGMENT_TAG)) {
+
+                if (penultFragmentTag.equals(Constants.AUDIOBOOKS_FRAGMENT_TAG)) {
+                    shouldCommitFragment = false;
+                    mBinding.bottomBarAm.setSelectedItemId(R.id.mi_audiobooks);
+                    getSupportFragmentManager().popBackStack();
+                    return;
+                }
+
+                if (penultFragmentTag.equals(Constants.MOVIES_FRAGMENT_TAG)) {
+                    shouldCommitFragment = false;
+                    mBinding.bottomBarAm.setSelectedItemId(R.id.mi_movies);
+                    getSupportFragmentManager().popBackStack();
+                    return;
+                }
+
+                if (penultFragmentTag.equals(Constants.PODCASTS_FRAGMENT_TAG)) {
+                    shouldCommitFragment = false;
+                    mBinding.bottomBarAm.setSelectedItemId(R.id.mi_podcasts);
+                    getSupportFragmentManager().popBackStack();
+                    return;
+                }
+
+                if (penultFragmentTag.equals(Constants.FAVOURITES_FRAGMENT_TAG)) {
+                    shouldCommitFragment = false;
+                    mBinding.bottomBarAm.setSelectedItemId(R.id.mi_favourites);
+                    getSupportFragmentManager().popBackStack();
+                    return;
+                }
+            }
+        }
+
+        if (fragmentManager.getBackStackEntryCount() > 1) {
+
+            final String fragmentTag =
+                    fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 2).getName();
+
+            if (fragmentTag.equals(Constants.AUDIOBOOKS_FRAGMENT_TAG)) {
+                shouldCommitFragment = false;
+                mBinding.bottomBarAm.setSelectedItemId(R.id.mi_audiobooks);
+                getSupportFragmentManager().popBackStack();
+                return;
+            }
+
+            if (fragmentTag.equals(Constants.MOVIES_FRAGMENT_TAG)) {
+                shouldCommitFragment = false;
+                mBinding.bottomBarAm.setSelectedItemId(R.id.mi_movies);
+                getSupportFragmentManager().popBackStack();
+                return;
+            }
+
+            if (fragmentTag.equals(Constants.PODCASTS_FRAGMENT_TAG)) {
+                shouldCommitFragment = false;
+                mBinding.bottomBarAm.setSelectedItemId(R.id.mi_podcasts);
+                getSupportFragmentManager().popBackStack();
+                return;
+            }
+
+            if (fragmentTag.equals(Constants.FAVOURITES_FRAGMENT_TAG)) {
+                shouldCommitFragment = false;
+                mBinding.bottomBarAm.setSelectedItemId(R.id.mi_favourites);
+                getSupportFragmentManager().popBackStack();
+                return;
+            }
+        }
+
+        if (fragmentManager.getBackStackEntryCount() == 1)
+            finish();
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle _outState) {
-        super.onSaveInstanceState(_outState);
+    public void setShouldCommitFragment(boolean _shouldCommitFragment) {
 
-        final BaseFragment baseFragment = (BaseFragment) getSupportFragmentManager().findFragmentById(R.id.fl_container_am);
-
-        if (baseFragment instanceof AudiobooksFragment)
-            _outState.putInt(Constants.FRAGMENT_TYPE_KEY, Constants.FRAGMENT_TYPE_AUDIOBOOKS);
-
-        if (baseFragment instanceof MoviesFragment)
-            _outState.putInt(Constants.FRAGMENT_TYPE_KEY, Constants.FRAGMENT_TYPE_MOVIES);
-
-        if (baseFragment instanceof PodcastsFragment)
-            _outState.putInt(Constants.FRAGMENT_TYPE_KEY, Constants.FRAGMENT_TYPE_PODCASTS);
-
-        if (baseFragment instanceof FavouritesFragment)
-            _outState.putInt(Constants.FRAGMENT_TYPE_KEY, Constants.FRAGMENT_TYPE_FAVOURITES);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle _savedInstanceState) {
-        super.onRestoreInstanceState(_savedInstanceState);
-
-        final int fragmentType = _savedInstanceState.getInt(Constants.FRAGMENT_TYPE_KEY);
-
-        if (fragmentType == Constants.FRAGMENT_TYPE_AUDIOBOOKS) {
-
-            mBinding.bottomBarAm.setSelectedItemId(R.id.mi_audiobooks);
-            commitFragment(new AudiobooksFragment(), null);
-        }
-
-        if (fragmentType == Constants.FRAGMENT_TYPE_MOVIES) {
-
-            mBinding.bottomBarAm.setSelectedItemId(R.id.mi_movies);
-            commitFragment(new MoviesFragment(), null);
-        }
-
-        if (fragmentType == Constants.FRAGMENT_TYPE_PODCASTS) {
-
-            mBinding.bottomBarAm.setSelectedItemId(R.id.mi_podcasts);
-            commitFragment(new PodcastsFragment(), null);
-        }
-
-        if (fragmentType == Constants.FRAGMENT_TYPE_FAVOURITES) {
-
-            mBinding.bottomBarAm.setSelectedItemId(R.id.mi_favourites);
-            commitFragment(new FavouritesFragment(), null);
-        }
+        this.shouldCommitFragment = _shouldCommitFragment;
     }
 }

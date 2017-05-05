@@ -12,7 +12,7 @@ import com.mitso.testapp.constants.Constants;
 import com.mitso.testapp.databinding.CardEntryFavouriteBinding;
 import com.mitso.testapp.databinding.CardHeaderBinding;
 import com.mitso.testapp.databinding.CardSeparatorBinding;
-import com.mitso.testapp.models.Entry;
+import com.mitso.testapp.models.json_entry_list.Entry;
 import com.mitso.testapp.models.recycler_view.BaseModel;
 import com.mitso.testapp.models.recycler_view.Header;
 import com.mitso.testapp.models.recycler_view.Separator;

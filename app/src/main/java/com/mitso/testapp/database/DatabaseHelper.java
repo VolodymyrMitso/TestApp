@@ -8,7 +8,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String      DATABASE_NAME       = "entries_database.db";
     public static final int         DATABASE_VERSION    = 1;
-    public static final String      DATABASE_TABLE      = "entries_table";
+
+    public static final String      DATABASE_AUDIOBOOKS_TABLE       = "audiobooks_table";
+    public static final String      DATABASE_MOVIES_TABLE           = "movies_table";
+    public static final String      DATABASE_PODCASTS_TABLE         = "podcasts_table";
+    public static final String      DATABASE_FAVOURITES_TABLE       = "favourites_table";
 
     public static final String      COLUMN_DATABASE_ID              = "_id";
     public static final String      COLUMN_ENTRY_NAME               = "name";
@@ -36,6 +40,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String      EQUALS_SIGN         = "=";
     public static final String      QUESTION_MARK       = "?";
 
+    public static final String      DELETE_FROM         = "delete from";
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private static DatabaseHelper instance;
@@ -59,7 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase _db) {
 
         _db.execSQL(
-                CREATE_TABLE + SPACE + DATABASE_TABLE + SPACE +
+                CREATE_TABLE + SPACE + DATABASE_FAVOURITES_TABLE + SPACE +
                         PARENTHESES_IN +
                         COLUMN_DATABASE_ID + SPACE + INTEGER_PRIMARY_KEY + COMMA + SPACE +
                         COLUMN_ENTRY_NAME + SPACE + TEXT + COMMA + SPACE +
@@ -77,6 +83,62 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         PARENTHESES_OUT
         );
 
+        _db.execSQL(
+                CREATE_TABLE + SPACE + DATABASE_AUDIOBOOKS_TABLE + SPACE +
+                        PARENTHESES_IN +
+                        COLUMN_DATABASE_ID + SPACE + INTEGER_PRIMARY_KEY + COMMA + SPACE +
+                        COLUMN_ENTRY_NAME + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_PRICE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_IMAGE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_ARTIST + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_CONTENT_TYPE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_RELEASE_DATE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_LINK + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_RIGHTS + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_TITLE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_ID + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_CATEGORY + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_SUMMARY + SPACE + TEXT +
+                        PARENTHESES_OUT
+        );
+
+        _db.execSQL(
+                CREATE_TABLE + SPACE + DATABASE_MOVIES_TABLE + SPACE +
+                        PARENTHESES_IN +
+                        COLUMN_DATABASE_ID + SPACE + INTEGER_PRIMARY_KEY + COMMA + SPACE +
+                        COLUMN_ENTRY_NAME + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_PRICE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_IMAGE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_ARTIST + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_CONTENT_TYPE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_RELEASE_DATE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_LINK + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_RIGHTS + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_TITLE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_ID + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_CATEGORY + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_SUMMARY + SPACE + TEXT +
+                        PARENTHESES_OUT
+        );
+
+        _db.execSQL(
+                CREATE_TABLE + SPACE + DATABASE_PODCASTS_TABLE + SPACE +
+                        PARENTHESES_IN +
+                        COLUMN_DATABASE_ID + SPACE + INTEGER_PRIMARY_KEY + COMMA + SPACE +
+                        COLUMN_ENTRY_NAME + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_PRICE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_IMAGE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_ARTIST + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_CONTENT_TYPE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_RELEASE_DATE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_LINK + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_RIGHTS + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_TITLE + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_ID + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_CATEGORY + SPACE + TEXT + COMMA + SPACE +
+                        COLUMN_ENTRY_SUMMARY + SPACE + TEXT +
+                        PARENTHESES_OUT
+        );
     }
 
     @Override

@@ -7,7 +7,7 @@
     <data>
         <variable
             name="entry"
-            type="com.mitso.testapp.models.Entry" />
+            type="com.mitso.testapp.models.json_entry_list.Entry" />
 
         <variable
             name="clickerInfo"

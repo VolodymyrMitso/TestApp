@@ -7,7 +7,10 @@
     <string name="s_podcasts">Podcasts</string>
     <string name="s_favourites">Favourites</string>
 
-    <string name="s_no_network_connection">
+    <string name="s_first_run">
+        App need network connection for first successful run. Please turn on wi-fi or 3g/4g. Please restart the app.
+    </string>
+    <string name="s_network_connection">
         There is no network connection. Please turn on wi-fi or 3g/4g. Please restart the app.
     </string>
     <string name="s_error">Something went wrong. Please restart the app.</string>
@@ -16,4 +19,5 @@
     <string name="s_already_in">Entry is already in favourites.</string>
     <string name="s_added">Entry is added to favourites.</string>
     <string name="s_deleted">Entry is deleted from favourites.</string>
+    <string name="s_add">Add to favourites</string>
 </resources>

@@ -5,7 +5,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import com.mitso.testapp.models.entry.EntryLink;
+import com.mitso.testapp.models.json_entry_list.entry.EntryLink;
 
 import java.io.IOException;
 import java.util.ArrayList;

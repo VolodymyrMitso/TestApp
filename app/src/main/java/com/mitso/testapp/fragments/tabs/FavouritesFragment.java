@@ -11,11 +11,12 @@ import android.view.ViewGroup;
 
 import com.mitso.testapp.R;
 import com.mitso.testapp.constants.Constants;
+import com.mitso.testapp.database.DatabaseHelper;
 import com.mitso.testapp.database.tasks.DbDeleteEntryTask;
 import com.mitso.testapp.database.tasks.DbGetEntryListTask;
 import com.mitso.testapp.databinding.FragmentListFavouriteBinding;
 import com.mitso.testapp.fragments.BaseFragment;
-import com.mitso.testapp.models.Entry;
+import com.mitso.testapp.models.json_entry_list.Entry;
 import com.mitso.testapp.models.recycler_view.BaseModel;
 import com.mitso.testapp.recycler_view.favourites.FavouriteAdapter;
 import com.mitso.testapp.recycler_view.favourites.IFavouriteHandler;
@@ -38,6 +39,8 @@ public class FavouritesFragment extends BaseFragment implements IFavouriteHandle
     @Override
     public View onCreateView(LayoutInflater _inflater, @Nullable ViewGroup _container, @Nullable Bundle _savedInstanceState) {
 
+        mMainActivity.setShouldCommitFragment(true);
+
         mBinding = DataBindingUtil.inflate(_inflater, R.layout.fragment_list_favourite, _container, false);
         final View rootView = mBinding.getRoot();
 
@@ -58,13 +61,19 @@ public class FavouritesFragment extends BaseFragment implements IFavouriteHandle
 
     private void initActionBar() {
 
-        if (mMainActivity.getSupportActionBar() != null)
+        if (mMainActivity.getSupportActionBar() != null) {
+
+            mMainActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            mMainActivity.getSupportActionBar().setHomeButtonEnabled(false);
+            mMainActivity.getSupportActionBar().setDisplayShowHomeEnabled(false);
+
             mMainActivity.getSupportActionBar().setTitle(getResources().getString(R.string.s_favourites));
+        }
     }
 
     private void getEntriesFromDatabase() {
 
-        final DbGetEntryListTask dbGetEntryListTask = new DbGetEntryListTask(mMainActivity);
+        final DbGetEntryListTask dbGetEntryListTask = new DbGetEntryListTask(mMainActivity, DatabaseHelper.DATABASE_FAVOURITES_TABLE);
         dbGetEntryListTask.setCallback(new DbGetEntryListTask.Callback() {
             @Override
             public void onSuccess(List<Entry> _result) {
@@ -73,7 +82,7 @@ public class FavouritesFragment extends BaseFragment implements IFavouriteHandle
 
                     if (!_result.isEmpty()) {
 
-                        Log.i(dbGetEntryListTask.LOG_TAG, "ON SUCCESS: FAVOURITES LIST.");
+                        Log.i(dbGetEntryListTask.LOG_TAG, "ON SUCCESS: FAVOURITE LIST.");
 
                         mFavouriteList = mSupport.groupList(mMainActivity, _result);
 
@@ -86,11 +95,8 @@ public class FavouritesFragment extends BaseFragment implements IFavouriteHandle
                         mSupport.showToastEmptyFavourites(mMainActivity);
                     }
 
-                } else {
-
-                    Log.e(dbGetEntryListTask.LOG_TAG, "ON SUCCESS.");
+                } else
                     Log.e(dbGetEntryListTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
-                }
 
                 dbGetEntryListTask.releaseCallback();
             }
@@ -105,11 +111,8 @@ public class FavouritesFragment extends BaseFragment implements IFavouriteHandle
 
                     mSupport.showToastError(mMainActivity);
 
-                } else {
-
-                    Log.e(dbGetEntryListTask.LOG_TAG, "ON FAILURE.");
+                } else
                     Log.e(dbGetEntryListTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
-                }
 
                 dbGetEntryListTask.releaseCallback();
             }
@@ -150,11 +153,8 @@ public class FavouritesFragment extends BaseFragment implements IFavouriteHandle
                     Log.i(dbDeleteEntryTask.LOG_TAG, "ON SUCCESS: ENTRY IS DELETED FROM DATABASE.");
                     mSupport.showToastDeleted(mMainActivity);
 
-                } else {
-
-                    Log.e(dbDeleteEntryTask.LOG_TAG, "ON SUCCESS.");
+                } else
                     Log.e(dbDeleteEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
-                }
 
                 dbDeleteEntryTask.releaseCallback();
             }
@@ -169,11 +169,9 @@ public class FavouritesFragment extends BaseFragment implements IFavouriteHandle
 
                     mSupport.showToastError(mMainActivity);
 
-                } else {
-
-                    Log.e(dbDeleteEntryTask.LOG_TAG, "ON FAILURE.");
+                } else
                     Log.e(dbDeleteEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
-                }
+
 
                 dbDeleteEntryTask.releaseCallback();
             }

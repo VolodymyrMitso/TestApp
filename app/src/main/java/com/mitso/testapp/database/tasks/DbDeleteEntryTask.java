@@ -7,13 +7,13 @@ import android.os.AsyncTask;
 import com.google.gson.Gson;
 import com.mitso.testapp.constants.Constants;
 import com.mitso.testapp.database.DatabaseHelper;
-import com.mitso.testapp.models.Entry;
+import com.mitso.testapp.models.json_entry_list.Entry;
 
 public class DbDeleteEntryTask extends AsyncTask<Void, Void, Void> {
 
     public String               LOG_TAG = Constants.DB_DELETE_ENTRY_TASK_LOG_TAG;
 
-    public interface Callback{
+    public interface Callback {
 
         void onSuccess();
         void onFailure(Throwable _error);
@@ -49,7 +49,7 @@ public class DbDeleteEntryTask extends AsyncTask<Void, Void, Void> {
         try {
             mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
 
-            mSQLiteDatabase.delete(DatabaseHelper.DATABASE_TABLE,
+            mSQLiteDatabase.delete(DatabaseHelper.DATABASE_FAVOURITES_TABLE,
                     DatabaseHelper.COLUMN_ENTRY_ID + DatabaseHelper.EQUALS_SIGN + DatabaseHelper.QUESTION_MARK,
                     new String[] { new Gson().toJson(mEntry.getId()) });
 

@@ -20,4 +20,11 @@
     <dimen name="d_line_size_cs">1dp</dimen>
 
     <dimen name="d_bottom_padding_flf">15dp</dimen>
+
+    <dimen name="d_image_size_fi">150dp</dimen>
+    <dimen name="d_text_size_fi">17sp</dimen>
+    <dimen name="d_padding_fi">20dp</dimen>
+    <dimen name="d_margin_big_fi">20dp</dimen>
+    <dimen name="d_margin_small_fi">5dp</dimen>
+
 </resources>

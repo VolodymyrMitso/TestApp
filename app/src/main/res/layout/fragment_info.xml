@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="result"
+            type="com.mitso.testapp.models.json_result.Result" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/d_padding_fi">
+
+        <ImageView
+            android:id="@+id/iv_cover_fi"
+            android:layout_width="@dimen/d_image_size_fi"
+            android:layout_height="@dimen/d_image_size_fi"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/d_margin_big_fi" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/c_info_text"
+            android:textSize="@dimen/d_text_size_fi"
+            tools:text="Collection or Track"
+            android:text="@{result.trackName != null ? result.trackName : result.collectionName}"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/c_info_text"
+            android:textSize="@dimen/d_text_size_fi"
+            tools:text="Artist"
+            android:text="@{result.artistName}"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/c_info_text"
+            android:textSize="@dimen/d_text_size_fi"
+            tools:text="Type"
+            android:text="@{result.kind ?? result.wrapperType}"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/c_info_text"
+            android:textSize="@dimen/d_text_size_fi"
+            tools:text="Genre"
+            android:text="@{result.primaryGenreName}"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/d_margin_small_fi"
+                android:layout_marginRight="@dimen/d_margin_small_fi"
+                android:textColor="@color/c_info_text"
+                android:textSize="@dimen/d_text_size_fi"
+                tools:text="Price"
+                android:text="@{String.valueOf(result.collectionPrice)}"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/c_info_text"
+                android:textSize="@dimen/d_text_size_fi"
+                tools:text="Currency"
+                android:text="@{result.currency}"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

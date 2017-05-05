@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.mitso.testapp.constants.Constants;
 import com.mitso.testapp.databinding.CardEntryCommonBinding;
-import com.mitso.testapp.models.Entry;
+import com.mitso.testapp.models.json_entry_list.Entry;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -8,19 +8,19 @@ import android.os.AsyncTask;
 import com.google.gson.Gson;
 import com.mitso.testapp.constants.Constants;
 import com.mitso.testapp.database.DatabaseHelper;
-import com.mitso.testapp.models.Entry;
-import com.mitso.testapp.models.entry.EntryCategory;
-import com.mitso.testapp.models.entry.EntryId;
-import com.mitso.testapp.models.entry.EntryLink;
-import com.mitso.testapp.models.entry.EntryRights;
-import com.mitso.testapp.models.entry.EntrySummary;
-import com.mitso.testapp.models.entry.EntryTitle;
-import com.mitso.testapp.models.entry.ImArtist;
-import com.mitso.testapp.models.entry.ImContentType;
-import com.mitso.testapp.models.entry.ImImage;
-import com.mitso.testapp.models.entry.ImName;
-import com.mitso.testapp.models.entry.ImPrice;
-import com.mitso.testapp.models.entry.ImReleaseDate;
+import com.mitso.testapp.models.json_entry_list.Entry;
+import com.mitso.testapp.models.json_entry_list.entry.EntryCategory;
+import com.mitso.testapp.models.json_entry_list.entry.EntryId;
+import com.mitso.testapp.models.json_entry_list.entry.EntryLink;
+import com.mitso.testapp.models.json_entry_list.entry.EntryRights;
+import com.mitso.testapp.models.json_entry_list.entry.EntrySummary;
+import com.mitso.testapp.models.json_entry_list.entry.EntryTitle;
+import com.mitso.testapp.models.json_entry_list.entry.ImArtist;
+import com.mitso.testapp.models.json_entry_list.entry.ImContentType;
+import com.mitso.testapp.models.json_entry_list.entry.ImImage;
+import com.mitso.testapp.models.json_entry_list.entry.ImName;
+import com.mitso.testapp.models.json_entry_list.entry.ImPrice;
+import com.mitso.testapp.models.json_entry_list.entry.ImReleaseDate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +30,7 @@ public class DbGetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
 
     public String               LOG_TAG = Constants.DB_GET_ENTRY_LIST_TASK_LOG_TAG;
 
-    public interface Callback{
+    public interface Callback {
 
         void onSuccess(List<Entry> _result);
         void onFailure(Throwable _error);
@@ -38,15 +38,17 @@ public class DbGetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
 
     private DatabaseHelper      mDatabaseHelper;
     private List<Entry>         mEntryList;
+    private String              mTableName;
     private Callback            mCallback;
     private Exception           mException;
     private SQLiteDatabase      mSQLiteDatabase;
     private Cursor              mCursor;
 
-    public DbGetEntryListTask(Context _context) {
+    public DbGetEntryListTask(Context _context, String _tableName) {
 
         this.mDatabaseHelper = DatabaseHelper.getDatabaseHelper(_context);
         this.mEntryList = new ArrayList<>();
+        this.mTableName = _tableName;
     }
 
     public void setCallback(Callback _callback) {
@@ -81,10 +83,9 @@ public class DbGetEntryListTask extends AsyncTask<Void, Void, List<Entry>> {
                     DatabaseHelper.COLUMN_ENTRY_ID,
                     DatabaseHelper.COLUMN_ENTRY_CATEGORY,
                     DatabaseHelper.COLUMN_ENTRY_SUMMARY
-
             };
 
-            mCursor = mSQLiteDatabase.query(DatabaseHelper.DATABASE_TABLE, projection,
+            mCursor = mSQLiteDatabase.query(mTableName, projection,
                     null, null, null, null, null);
 
             while (mCursor.moveToNext()) {
