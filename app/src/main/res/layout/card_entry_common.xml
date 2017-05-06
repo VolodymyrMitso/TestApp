@@ -61,7 +61,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/d_margin_cec"
             android:layout_marginRight="@dimen/d_margin_cec"
-            android:background="@drawable/ic_add_circle"
+            android:background="@{entry.isAddedToFavourites ? @drawable/ic_remove_circle_grey : @drawable/ic_add_circle_grey}"
             app:onClickListener="@{clickerAdd}" />
 
     </RelativeLayout>

@@ -46,11 +46,6 @@ public class Support {
         Toast.makeText(_context, R.string.s_empty_favourites, Toast.LENGTH_SHORT).show();
     }
 
-    public void showToastAlreadyIn(Context _context) {
-
-        Toast.makeText(_context, R.string.s_already_in, Toast.LENGTH_SHORT).show();
-    }
-
     public void showToastAdded(Context _context) {
 
         Toast.makeText(_context, R.string.s_added, Toast.LENGTH_SHORT).show();
@@ -59,6 +54,17 @@ public class Support {
     public void showToastDeleted(Context _context) {
 
         Toast.makeText(_context, R.string.s_deleted, Toast.LENGTH_SHORT).show();
+    }
+
+    public List<Entry> compareLists(List<Entry> _dbFavouriteList, List<Entry> _apiOrDbEntryList) {
+
+        final List<Entry> finalList = new ArrayList<>(_apiOrDbEntryList);
+
+        for (int i = 0; i < finalList.size(); i++)
+            if (_dbFavouriteList.contains(finalList.get(i)))
+                finalList.get(i).setAddedToFavourites(true);
+
+        return finalList;
     }
 
     public List<BaseModel> groupList(Context context, List<Entry> _entryList) {

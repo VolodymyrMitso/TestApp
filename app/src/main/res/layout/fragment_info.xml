@@ -28,7 +28,7 @@
             android:textColor="@color/c_info_text"
             android:textSize="@dimen/d_text_size_fi"
             tools:text="Collection or Track"
-            android:text="@{result.trackName != null ? result.trackName : result.collectionName}"/>
+            android:text="@{result.trackName ?? result.collectionName}"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/c_info_text"
             android:textSize="@dimen/d_text_size_fi"
-            tools:text="Type"
+            tools:text="Type or Kind"
             android:text="@{result.kind ?? result.wrapperType}"/>
 
         <TextView

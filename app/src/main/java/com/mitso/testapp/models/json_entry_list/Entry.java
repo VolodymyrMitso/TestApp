@@ -22,6 +22,8 @@ import java.util.List;
 
 public class Entry extends BaseModel implements Serializable {
 
+    private boolean isAddedToFavourites;
+
     @SerializedName("im:name")
     private ImName imName;
     @SerializedName("im:price")
@@ -92,6 +94,15 @@ public class Entry extends BaseModel implements Serializable {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public boolean isAddedToFavourites() {
+        return isAddedToFavourites;
+    }
+
+    public void setAddedToFavourites(boolean addedToFavourites) {
+        isAddedToFavourites = addedToFavourites;
+    }
 
     public ImName getImName() {
         return imName;

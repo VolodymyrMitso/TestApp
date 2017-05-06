@@ -14,6 +14,7 @@ import com.mitso.testapp.api.tasks.ApiGetEntryListTask;
 import com.mitso.testapp.constants.Constants;
 import com.mitso.testapp.database.DatabaseHelper;
 import com.mitso.testapp.database.tasks.DbAddEntryTask;
+import com.mitso.testapp.database.tasks.DbDeleteEntryTask;
 import com.mitso.testapp.database.tasks.DbGetEntryListTask;
 import com.mitso.testapp.database.tasks.DbSaveEntryListTask;
 import com.mitso.testapp.databinding.FragmentListCommonBinding;
@@ -39,6 +40,8 @@ public class PodcastsFragment extends BaseFragment implements IEntryHandler {
     private List<Entry>                     mDbFavouriteList;
     private List<Entry>                     mApiPodcastList;
     private List<Entry>                     mDbPodcastList;
+
+    private List<Entry>                     mFinalList;
 
     private EntryAdapter                    mEntryAdapter;
 
@@ -189,7 +192,9 @@ public class PodcastsFragment extends BaseFragment implements IEntryHandler {
 
                     Log.i(dbSaveEntryListTask.LOG_TAG, "ON SUCCESS: PODCAST LIST IS SAVED TO DATABASE.");
 
-                    initRecyclerView(mApiPodcastList);
+                    mFinalList = mSupport.compareLists(mDbFavouriteList, mApiPodcastList);
+
+                    initRecyclerView();
                     setHandler();
 
                 } else
@@ -231,8 +236,9 @@ public class PodcastsFragment extends BaseFragment implements IEntryHandler {
                         Log.i(dbGetEntryListTask.LOG_TAG, "ON SUCCESS: PODCAST LIST IS TAKEN FROM DATABASE.");
 
                         mDbPodcastList = new ArrayList<>(_result);
+                        mFinalList = mSupport.compareLists(mDbFavouriteList, mDbPodcastList);
 
-                        initRecyclerView(mDbPodcastList);
+                        initRecyclerView();
                         setHandler();
 
                     } else {
@@ -266,9 +272,9 @@ public class PodcastsFragment extends BaseFragment implements IEntryHandler {
         dbGetEntryListTask.execute();
     }
 
-    private void initRecyclerView(List<Entry> _entryList) {
+    private void initRecyclerView() {
 
-        mEntryAdapter = new EntryAdapter(mMainActivity, _entryList);
+        mEntryAdapter = new EntryAdapter(mMainActivity, mFinalList);
 
         mBinding.rvEntriesFlc.setAdapter(mEntryAdapter);
         mBinding.rvEntriesFlc.setLayoutManager(new LinearLayoutManager(mMainActivity));
@@ -286,21 +292,15 @@ public class PodcastsFragment extends BaseFragment implements IEntryHandler {
     }
 
     @Override
-    public void addToFavourites(Entry _entry) {
+    public void addOrDelete(Entry _entry, int _position) {
 
-        if (!mDbFavouriteList.contains(_entry)) {
-
-            mDbFavouriteList.add(_entry);
-            addPodcastToFavouritesDatabase(_entry);
-
-        } else {
-
-            Log.i(LOG_TAG, "PODCAST IS ALREADY IN FAVOURITES DATABASE.");
-            mSupport.showToastAlreadyIn(mMainActivity);
-        }
+        if (!_entry.isAddedToFavourites())
+            addPodcastToFavourites(_entry, _position);
+        else
+            deletePodcastFromFavourites(_entry, _position);
     }
 
-    private void addPodcastToFavouritesDatabase(Entry _entry) {
+    private void addPodcastToFavourites(final Entry _entry, final int _position) {
 
         final DbAddEntryTask dbAddEntryTask = new DbAddEntryTask(mMainActivity, _entry);
         dbAddEntryTask.setCallback(new DbAddEntryTask.Callback() {
@@ -308,6 +308,9 @@ public class PodcastsFragment extends BaseFragment implements IEntryHandler {
             public void onSuccess() {
 
                 if (mMainActivity != null && isAdded()) {
+
+                    _entry.setAddedToFavourites(true);
+                    mEntryAdapter.notifyItemChanged(_position);
 
                     Log.i(dbAddEntryTask.LOG_TAG, "ON SUCCESS: PODCAST IS ADDED TO FAVOURITES DATABASE.");
                     mSupport.showToastAdded(mMainActivity);
@@ -335,6 +338,46 @@ public class PodcastsFragment extends BaseFragment implements IEntryHandler {
             }
         });
         dbAddEntryTask.execute();
+    }
+
+    private void deletePodcastFromFavourites(final Entry _entry, final int _position) {
+
+        final DbDeleteEntryTask dbDeleteEntryTask = new DbDeleteEntryTask(mMainActivity, _entry);
+        dbDeleteEntryTask.setCallback(new DbDeleteEntryTask.Callback() {
+            @Override
+            public void onSuccess() {
+
+                if (mMainActivity != null && isAdded()) {
+
+                    _entry.setAddedToFavourites(false);
+                    mEntryAdapter.notifyItemChanged(_position);
+
+                    Log.i(dbDeleteEntryTask.LOG_TAG, "ON SUCCESS: PODCAST IS DELETED FROM FAVOURITES DATABASE.");
+                    mSupport.showToastDeleted(mMainActivity);
+
+                } else
+                    Log.e(dbDeleteEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+
+                dbDeleteEntryTask.releaseCallback();
+            }
+
+            @Override
+            public void onFailure(Throwable _error) {
+
+                if (mMainActivity != null && isAdded()) {
+
+                    Log.e(dbDeleteEntryTask.LOG_TAG, "ON FAILURE: PODCAST IS NOT DELETED TO FAVOURITES DATABASE.");
+                    Log.e(dbDeleteEntryTask.LOG_TAG, _error.toString());
+
+                    mSupport.showToastError(mMainActivity);
+
+                } else
+                    Log.e(dbDeleteEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+
+                dbDeleteEntryTask.releaseCallback();
+            }
+        });
+        dbDeleteEntryTask.execute();
     }
 
     private void setHandler() {

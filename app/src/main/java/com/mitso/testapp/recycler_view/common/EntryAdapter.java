@@ -38,7 +38,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder _holder, int _position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder _holder, int _position) {
 
         final Entry entry = mEntryList.get(_position);
         final EntryViewHolder entryViewHolder = (EntryViewHolder) _holder;
@@ -55,7 +55,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         entryViewHolder.getBinding().setClickerAdd(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEntryHandler.addToFavourites(entry);
+                mEntryHandler.addOrDelete(entry, _holder.getAdapterPosition());
             }
         });
 

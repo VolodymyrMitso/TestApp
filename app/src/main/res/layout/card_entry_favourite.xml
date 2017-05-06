@@ -60,7 +60,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/d_margin_cef"
             android:layout_marginRight="@dimen/d_margin_cef"
-            android:background="@drawable/ic_remove_circle"
+            android:background="@drawable/ic_remove_circle_grey"
             app:onClickListener="@{clickerDelete}" />
 
     </RelativeLayout>

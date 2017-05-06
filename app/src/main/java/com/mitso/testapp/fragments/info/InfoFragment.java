@@ -17,6 +17,7 @@ import com.mitso.testapp.api.tasks.ApiGetResultTask;
 import com.mitso.testapp.constants.Constants;
 import com.mitso.testapp.database.DatabaseHelper;
 import com.mitso.testapp.database.tasks.DbAddEntryTask;
+import com.mitso.testapp.database.tasks.DbDeleteEntryTask;
 import com.mitso.testapp.database.tasks.DbGetEntryListTask;
 import com.mitso.testapp.databinding.FragmentInfoBinding;
 import com.mitso.testapp.fragments.BaseFragment;
@@ -38,14 +39,16 @@ public class InfoFragment extends BaseFragment {
     private List<Entry>                 mDbFavouriteList;
 
     private Entry                       mEntry;
-    private boolean                     isEntryNull;
 
     private Result                      mResult;
 
+    private Menu                        mMenu;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater _inflater, @Nullable ViewGroup _container, @Nullable Bundle _savedInstanceState) {
+
+        mMainActivity.setShouldCommitFragment(true);
 
         mBinding = DataBindingUtil.inflate(_inflater, R.layout.fragment_info, _container, false);
         final View rootView = mBinding.getRoot();
@@ -55,11 +58,9 @@ public class InfoFragment extends BaseFragment {
         initSupport();
 
         getEntry();
-
-        initActionBar();
-        setHasOptionsMenu(true);
-
         getFavouritesFromDatabase();
+
+        setHasOptionsMenu(true);
 
         return rootView;
     }
@@ -77,27 +78,12 @@ public class InfoFragment extends BaseFragment {
             if (mEntry == null)
                 throw new NullPointerException();
 
-            isEntryNull = false;
             Log.i(LOG_TAG, "ENTRY IS RECEIVED");
 
         } catch (NullPointerException _error) {
 
-            isEntryNull = true;
             Log.e(LOG_TAG, "ENTRY IS NULL.");
             mSupport.showToastError(mMainActivity);
-        }
-    }
-
-    private void initActionBar() {
-
-        if (mMainActivity.getSupportActionBar() != null) {
-
-            mMainActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            mMainActivity.getSupportActionBar().setHomeButtonEnabled(true);
-            mMainActivity.getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-            if (!isEntryNull)
-                mMainActivity.getSupportActionBar().setTitle(mEntry.getImContentType().getAttributes().getLabel());
         }
     }
 
@@ -122,6 +108,8 @@ public class InfoFragment extends BaseFragment {
 
                         mDbFavouriteList = new ArrayList<>();
                     }
+
+                    initActionBar();
 
                     if (mSupport.checkNetworkConnection(mMainActivity)) {
 
@@ -160,6 +148,167 @@ public class InfoFragment extends BaseFragment {
         dbGetEntryListTask.execute();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu _menu, MenuInflater _inflater) {
+
+        mMainActivity.getMenuInflater().inflate(R.menu.menu_info, _menu);
+
+        mMenu = _menu;
+
+        super.onCreateOptionsMenu(_menu, _inflater);
+    }
+
+    private void initActionBar() {
+
+        if (mMainActivity.getSupportActionBar() != null) {
+
+            mMainActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            mMainActivity.getSupportActionBar().setHomeButtonEnabled(true);
+            mMainActivity.getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+            if (mEntry != null)
+                mMainActivity.getSupportActionBar().setTitle(mEntry.getImContentType().getAttributes().getLabel());
+        }
+
+        if (mDbFavouriteList != null && mEntry != null) {
+
+            if (!mDbFavouriteList.contains(mEntry)) {
+
+                mMenu.getItem(0).setIcon(mMainActivity.getResources().getDrawable(R.drawable.ic_add_circle_white));
+                mMenu.getItem(0).setTitle(mMainActivity.getResources().getString(R.string.s_add));
+
+            } else {
+
+                mMenu.getItem(0).setIcon(mMainActivity.getResources().getDrawable(R.drawable.ic_remove_circle_white));
+                mMenu.getItem(0).setTitle(mMainActivity.getResources().getString(R.string.s_delete));
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem _item) {
+
+        switch (_item.getItemId()) {
+
+            case android.R.id.home:
+                mMainActivity.onBackPressed();
+                return true;
+
+            case R.id.mi_add_or_delete:
+                addOrDelete();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(_item);
+        }
+    }
+
+    public void addOrDelete() {
+
+        if (mDbFavouriteList!= null && mEntry != null) {
+
+            if (!mDbFavouriteList.contains(mEntry)) {
+
+                mDbFavouriteList.add(mEntry);
+                addEntryToFavouritesDatabase();
+
+            } else {
+
+                mDbFavouriteList.remove(mEntry);
+                deleteEntryFromFavouritesDatabase();
+            }
+
+        } else {
+
+            Log.e(LOG_TAG, "FAVOURITE LIST IS NULL OR ENTRY IS NULL.");
+            mSupport.showToastError(mMainActivity);
+        }
+    }
+
+    private void addEntryToFavouritesDatabase() {
+
+        final DbAddEntryTask dbAddEntryTask = new DbAddEntryTask(mMainActivity, mEntry);
+        dbAddEntryTask.setCallback(new DbAddEntryTask.Callback() {
+            @Override
+            public void onSuccess() {
+
+                if (mMainActivity != null && isAdded()) {
+
+                    mEntry.setAddedToFavourites(true);
+
+                    mMenu.getItem(0).setIcon(mMainActivity.getResources().getDrawable(R.drawable.ic_remove_circle_white));
+                    mMenu.getItem(0).setTitle(mMainActivity.getResources().getString(R.string.s_delete));
+
+                    Log.i(dbAddEntryTask.LOG_TAG, "ON SUCCESS: ENTRY IS ADDED TO FAVOURITES DATABASE.");
+                    mSupport.showToastAdded(mMainActivity);
+
+                } else
+                    Log.e(dbAddEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+
+                dbAddEntryTask.releaseCallback();
+            }
+
+            @Override
+            public void onFailure(Throwable _error) {
+
+                if (mMainActivity != null && isAdded()) {
+
+                    Log.e(dbAddEntryTask.LOG_TAG, "ON FAILURE: ENTRY IS NOT ADDED TO FAVOURITES DATABASE.");
+                    Log.e(dbAddEntryTask.LOG_TAG, _error.toString());
+
+                    mSupport.showToastError(mMainActivity);
+
+                } else
+                    Log.e(dbAddEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+
+                dbAddEntryTask.releaseCallback();
+            }
+        });
+        dbAddEntryTask.execute();
+    }
+
+    private void deleteEntryFromFavouritesDatabase() {
+
+        final DbDeleteEntryTask dbDeleteEntryTask = new DbDeleteEntryTask(mMainActivity, mEntry);
+        dbDeleteEntryTask.setCallback(new DbDeleteEntryTask.Callback() {
+            @Override
+            public void onSuccess() {
+
+                if (mMainActivity != null && isAdded()) {
+
+                    mEntry.setAddedToFavourites(false);
+
+                    mMenu.getItem(0).setIcon(mMainActivity.getResources().getDrawable(R.drawable.ic_add_circle_white));
+                    mMenu.getItem(0).setTitle(mMainActivity.getResources().getString(R.string.s_add));
+
+                    Log.i(dbDeleteEntryTask.LOG_TAG, "ON SUCCESS: ENTRY IS DELETED FROM FAVOURITES DATABASE.");
+                    mSupport.showToastDeleted(mMainActivity);
+
+                } else
+                    Log.e(dbDeleteEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+
+                dbDeleteEntryTask.releaseCallback();
+            }
+
+            @Override
+            public void onFailure(Throwable _error) {
+
+                if (mMainActivity != null && isAdded()) {
+
+                    Log.e(dbDeleteEntryTask.LOG_TAG, "ON FAILURE: ENTRY IS NOT DELETED FROM FAVOURITES DATABASE.");
+                    Log.e(dbDeleteEntryTask.LOG_TAG, _error.toString());
+
+                    mSupport.showToastError(mMainActivity);
+
+                } else
+                    Log.e(dbDeleteEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
+
+                dbDeleteEntryTask.releaseCallback();
+            }
+        });
+        dbDeleteEntryTask.execute();
+    }
+
     public void getResultById() {
 
         final ApiGetResultTask apiGetResultTask = new ApiGetResultTask(mEntry.getId().getAttributes().getImId());
@@ -169,7 +318,7 @@ public class InfoFragment extends BaseFragment {
 
                 if (mMainActivity != null && isAdded()) {
 
-                    Log.i(apiGetResultTask.LOG_TAG, "ON SUCCESS: RESULT.");
+                    Log.i(apiGetResultTask.LOG_TAG, "ON SUCCESS: RESULT IS TAKEN FROM API.");
 
                     mResult = _result;
 
@@ -186,13 +335,13 @@ public class InfoFragment extends BaseFragment {
 
                 if (mMainActivity != null && isAdded()) {
 
-                    Log.e(apiGetResultTask.LOG_TAG, "ON FAILURE: ERROR.");
+                    Log.e(apiGetResultTask.LOG_TAG, "ON FAILURE: RESULT IS NOT TAKEN FROM API.");
                     Log.e(apiGetResultTask.LOG_TAG, _error.toString());
 
                     mSupport.showToastError(mMainActivity);
 
                 } else
-                    Log.e(apiGetResultTask.LOG_TAG, "ON FAILURE: AUDIOBOOK LIST IS NOT TAKEN FROM API.");
+                    Log.e(apiGetResultTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
 
                 apiGetResultTask.releaseCallback();
             }
@@ -207,90 +356,5 @@ public class InfoFragment extends BaseFragment {
                 .into(mBinding.ivCoverFi);
 
         mBinding.setResult(mResult);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu _menu, MenuInflater _inflater) {
-
-        mMainActivity.getMenuInflater().inflate(R.menu.menu_info, _menu);
-
-        super.onCreateOptionsMenu(_menu, _inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem _item) {
-
-        switch (_item.getItemId()) {
-
-            case android.R.id.home:
-                mMainActivity.onBackPressed();
-                return true;
-
-            case R.id.mi_add:
-                addToFavourites(mEntry);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(_item);
-        }
-    }
-
-    public void addToFavourites(Entry _entry) {
-
-        if (!isEntryNull) {
-
-            if (!mDbFavouriteList.contains(_entry)) {
-
-                mDbFavouriteList.add(_entry);
-                addEntryToFavouritesDatabase(_entry);
-
-            } else {
-
-                Log.i(LOG_TAG, "ENTRY IS ALREADY IN FAVOURITES DATABASE.");
-                mSupport.showToastAlreadyIn(mMainActivity);
-            }
-
-        } else {
-
-            Log.e(LOG_TAG, "ENTRY IS NULL.");
-            mSupport.showToastError(mMainActivity);
-        }
-    }
-
-    private void addEntryToFavouritesDatabase(Entry _entry) {
-
-        final DbAddEntryTask dbAddEntryTask = new DbAddEntryTask(mMainActivity, _entry);
-        dbAddEntryTask.setCallback(new DbAddEntryTask.Callback() {
-            @Override
-            public void onSuccess() {
-
-                if (mMainActivity != null && isAdded()) {
-
-                    Log.i(dbAddEntryTask.LOG_TAG, "ON SUCCESS: AUDIOBOOK IS ADDED TO FAVOURITES DATABASE.");
-                    mSupport.showToastAdded(mMainActivity);
-
-                } else
-                    Log.e(dbAddEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
-
-                dbAddEntryTask.releaseCallback();
-            }
-
-            @Override
-            public void onFailure(Throwable _error) {
-
-                if (mMainActivity != null && isAdded()) {
-
-                    Log.e(dbAddEntryTask.LOG_TAG, "ON FAILURE: AUDIOBOOK IS NOT ADDED TO FAVOURITES DATABASE.");
-                    Log.e(dbAddEntryTask.LOG_TAG, _error.toString());
-
-                    mSupport.showToastError(mMainActivity);
-
-                } else
-                    Log.e(dbAddEntryTask.LOG_TAG, "ACTIVITY IS NULL OR FRAGMENT IS NOT ADDED.");
-
-                dbAddEntryTask.releaseCallback();
-            }
-        });
-        dbAddEntryTask.execute();
     }
 }
